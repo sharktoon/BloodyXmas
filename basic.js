@@ -3,9 +3,11 @@
  */
 
 var MyGame = {
+    renderer: undefined,
     dimensions: { width: 800, height: 600 },
     bGameEnded: false,
-    iTickLength: 33
+    iTickLength: 33,
+    iMaxTickLength: 60
 };
 
 
@@ -171,6 +173,9 @@ $(document).ready(function () {
 
         if (tFrame > nextTick) {
             var timeSinceTick = tFrame - MyGame.lastTick;
+            if (timeSinceTick > MyGame.iMaxTickLength) {
+                timeSinceTick = MyGame.iMaxTickLength;
+            }
 
             update(timeSinceTick);
 
@@ -181,6 +186,9 @@ $(document).ready(function () {
 
     function update(tDelta) {
         // called each 'tick' with a precise time since last tick
+        if (MyGame.renderer) {
+            MyGame.renderer.update(tDelta);
+        }
     }
 
     function setInitialState() {
@@ -190,13 +198,21 @@ $(document).ready(function () {
     function render(tFrame) {
         // draw stuff!
         var context = canvas.get(0).getContext('2d');
-        var text = "t = " + tFrame;
-        context.fillStyle = "rgb(200,200,200)";
-        context.fillRect(0, 0, canvas.width(), canvas.height());
-        context.font = "30px serif";
-        context.fontcolor = "white";
-        context.fillStyle = "black";
-        context.fillText(text, 50, 50);
+        context.save();
+        context.scale(scale, scale);
+        if (MyGame.renderer) {
+            MyGame.renderer.render(tFrame, context);
+        } else {
+            var text = "t = " + tFrame;
+            context.fillStyle = "rgb(200,200,200)";
+            context.fillRect(0, 0, MyGame.dimensions.width, MyGame.dimensions.height);
+            context.font = "30px serif";
+            context.fontcolor = "white";
+            context.fillStyle = "black";
+            context.fillText(text, 50, 50);
+            context.fillText("No renderer configured!", 50, 100);
+        }
+        context.restore();
     }
 
     MyGame.lastTick = window.performance.now();
