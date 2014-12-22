@@ -14,45 +14,6 @@ var MyGame = {
 $(document).ready(function () {
     var canvas = $("#TheCanvas");//window.document.getElementById("TheCanvas");
 
-    // -- IMAGE LOADING AND DRAWING ----------------------------
-    var imageList = {};
-
-    MyGame.loadImage = function(name, callback) {
-        if (imageList.hasOwnProperty(name)) {
-            setTimeout(callback, 0);
-        }
-        var image = new Image();
-        imageList[name] = image;
-        if (callback) {
-            image.onload = callback;
-        }
-        image.src = "img/" + name;
-    };
-
-    MyGame.isImageReady = function(name) {
-        if (!imageList.hasOwnProperty(name)) {
-            return false;
-        }
-        return imageList[name].complete;
-    };
-
-    MyGame.unloadImage = function(name) {
-        if (imageList.hasOwnProperty(name)) {
-            delete imageList[name];
-        }
-    };
-
-    MyGame.drawImage = function(context, imagename, x, y) {
-        x = x || 0;
-        y = y || 0;
-        if (MyGame.isImageReady(imagename)) {
-            context.drawImage(imageList[imagename], x, y);
-            return true;
-        } else {
-            return false;
-        }
-    };
-
     var scale = 1;
 
     function resizeCanvas() {
@@ -124,7 +85,6 @@ $(document).ready(function () {
     function onTouchStart(eventData) {
         var pos = eventPos(eventData);
 
-        var canvas = $("#gamecanvas");
         var touch_x = pos.pageX - canvas[0].offsetLeft;
         var touch_y = pos.pageY - canvas[0].offsetTop;
         touch_x = touch_x / scale;
@@ -137,7 +97,6 @@ $(document).ready(function () {
 
     function onTouchEnd(eventData) {
         var pos = eventPos(eventData);
-        var canvas = $("#gamecanvas");
         var touch_x = pos.pageX - canvas[0].offsetLeft;
         var touch_y = pos.pageY - canvas[0].offsetTop;
         touch_x = touch_x / scale;
@@ -193,6 +152,9 @@ $(document).ready(function () {
 
     function setInitialState() {
         // called to setup everything
+        if (MyGame.onStart) {
+            MyGame.onStart();
+        }
     }
 
     function render(tFrame) {
