@@ -11,10 +11,12 @@ function LoadScene() {
 
     };
 
+    var ended = false;
     this.update = function(tDelta) {
         ++step;
-        if (step > 100) {
-            MyGame.renderer.popScene();
+        if (step > 100 && !ended) {
+            ended = true;
+            MyGame.renderer.replaceScene(new IntroScene());
         }
     };
 

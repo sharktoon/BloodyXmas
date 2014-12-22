@@ -47,7 +47,7 @@ GameScene.prototype.render = function(tFrame, context) {
     that.pushScene = function(scene) {
         var oldScene = undefined;
         if (sceneStack.length > 0) {
-            oldScene = sceneStack.get(sceneStack.length - 1);
+            oldScene = sceneStack[sceneStack.length - 1];
         }
         sceneStack.push(scene);
         currentScene = scene;
@@ -63,10 +63,10 @@ GameScene.prototype.render = function(tFrame, context) {
     };
 
     that.popScene = function() {
-        var oldScene = sceneStack.get(sceneStack.length - 1);
+        var oldScene = sceneStack[sceneStack.length - 1];
         sceneStack.pop();
         if (sceneStack.length > 0) {
-            currentScene = sceneStack.get(sceneStack.length - 1);
+            currentScene = sceneStack[sceneStack.length - 1];
         } else {
             currentScene = undefined;
         }
@@ -86,7 +86,7 @@ GameScene.prototype.render = function(tFrame, context) {
     };
 
     that.replaceScene = function(scene) {
-        var oldScene = sceneStack.get(sceneStack.length - 1);
+        var oldScene = sceneStack[sceneStack.length - 1];
         sceneStack.pop();
         sceneStack.push(scene);
         currentScene = scene;
@@ -144,6 +144,7 @@ GameScene.prototype.render = function(tFrame, context) {
     // -- TEXT DRAWING --------------------------------------
     // text box consists of lines
     that.makeTextBox = function(context, text, width, lineHeight) {
+        lineHeight = lineHeight || 0;
         var box = {
             lines: [],
             lineHeight: lineHeight,
@@ -155,6 +156,9 @@ GameScene.prototype.render = function(tFrame, context) {
         for(var n = 0; n < words.length; ++n) {
             var testLine = line + words[n] + ' ';
             var metrics = context.measureText(testLine);
+            if (metrics.height > box.lineHeight) {
+                box.lineHeight = metrics.height;
+            }
             var testWidth = metrics.width;
             if (testWidth > width && n > 0) {
                 box.lines.push(line);
@@ -163,10 +167,14 @@ GameScene.prototype.render = function(tFrame, context) {
                 line = testLine;
             }
         }
+        box.lines.push(line);
         return box;
     };
 
     that.drawTextBox = function(context, box, x, y) {
+        if (box.lines === undefined) {
+            return;
+        }
         for(var i = 0; i < box.lines.length; ++i) {
             context.fillText(box.lines[i], x, y, box.widthLimit);
             y += box.lineHeight;

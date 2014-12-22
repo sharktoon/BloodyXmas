@@ -177,6 +177,10 @@ $(document).ready(function () {
         context.restore();
     }
 
+    MyGame.getDrawingContext = function() {
+        return canvas.get(0).getContext('2d');
+    };
+
     MyGame.lastTick = window.performance.now();
     MyGame.lastRender = MyGame.lastRender;
 
